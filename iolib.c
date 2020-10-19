@@ -7,6 +7,7 @@
 ** 19 May 93
 */
 
+
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -15,67 +16,81 @@
 #include "floatingpoint.h"
 #endif
 
+
 #include "lua.h"
 
+
+// #bugfix !!! 
 //static FILE *in=stdin, *out=stdout;
 
+
 /*
-** Open a file to read.
-** LUA interface:
-**			status = readfrom (filename)
-** where:
-**			status = 1 -> success
-**			status = 0 -> error
-*/
-static void io_readfrom (void)
-{
- lua_Object o = lua_getparam (1);
- if (o == NULL)			/* restore standart input */
- {
-  if ( stdin != stdin)
-  {
-   fclose (stdin);
-   stdin = stdin;
-  }
-  lua_pushnumber (1);
- }
- else
- {
-  if (!lua_isstring (o))
-  {
-   lua_error ("incorrect argument to function 'readfrom`");
-   lua_pushnumber (0);
-  }
-  else
-  {
-   FILE *fp = fopen (lua_getstring(o),"r");
-   if (fp == NULL)
-   {
-    lua_pushnumber (0);
-   }
-   else
-   {
-    if ( stdin != stdin) fclose (stdin);
-    stdin = fp;
-    lua_pushnumber (1);
-   }
-  }
- }
+ ***************************************************
+ ** Open a file to read.
+ ** LUA interface:
+ **			status = readfrom (filename)
+ ** where:
+ **			status = 1 -> success
+ **			status = 0 -> error
+ */
+
+static void io_readfrom (void){
+
+    lua_Object o = lua_getparam (1);
+ 
+     // #uglyhackhack
+     /* restore standart input */
+     if (o == NULL){
+
+         // #hahaha
+         if ( stdin != stdin )
+         {
+             fclose (stdin);
+             stdin = stdin;
+         }
+         lua_pushnumber (1);
+     
+     
+     }else{
+         
+         if (!lua_isstring (o))
+         {
+             lua_error ("incorrect argument to function 'readfrom`");
+             lua_pushnumber (0);
+         }
+         else
+         {
+             FILE *fp = fopen (lua_getstring(o),"r");
+             if (fp == NULL)
+             {
+                 lua_pushnumber (0);
+             }
+             else
+             {
+                 if ( stdin != stdin) fclose (stdin);
+                 stdin = fp;
+                 lua_pushnumber (1);
+             }
+          }
+    };
 }
 
 
 /*
-** Open a file to write.
-** LUA interface:
-**			status = writeto (filename)
-** where:
-**			status = 1 -> success
-**			status = 0 -> error
-*/
-static void io_writeto (void)
-{
- lua_Object o = lua_getparam (1);
- if (o == NULL)			/* restore standart output */
+ **********************************************
+ ** Open a file to write.
+ ** LUA interface:
+ **			status = writeto (filename)
+ ** where:
+ **			status = 1 -> success
+ **			status = 0 -> error
+ */
+
+static void io_writeto (void){
+
+    lua_Object o = lua_getparam (1);
+ 
+    if (o == NULL)			/* restore standart output */
  {
   if (stdout != stdout)
   {
@@ -236,13 +251,17 @@ static void io_read (void)
 }
 
 
+
 /*
-** Write a variable. On error put 0 on stack, otherwise put 1.
-** LUA interface:
-**			status = write (variable [,format])
-**
-** O formato pode ter um dos seguintes especificadores:
-**
+ **************************************************************
+ ** buildformat: 
+ *      Write a variable. On error put 0 on stack, otherwise put 1.
+ ** 
+ * LUA interface:
+ **			status = write (variable [,format])
+ **
+ ** O formato pode ter um dos seguintes especificadores:
+ **
 **	s ou S -> para string
 **	f ou F, g ou G, e ou E -> para reais
 **	i ou I -> para inteiros
@@ -262,13 +281,18 @@ static void io_read (void)
 **			inteiros -> numero minimo de digitos
 **			string -> nao se aplica
 */
-static char *buildformat (char *e, lua_Object o)
-{
- static char buffer[512];
- static char f[80];
- char *string = &buffer[255];
- char t, j='r';
- int  m=0, n=0, l;
+
+
+static char *buildformat (char *e, lua_Object o){
+
+    static char buffer[512];
+    static char f[80];
+    char *string = &buffer[255];
+    char t, j='r';
+    int  m=0, n=0, l;
+ 
+ 
+ 
  while (isspace(*e)) e++;
  t = *e++;
  if (*e == '<' || *e == '|' || *e == '>') j = *e++;
@@ -315,12 +339,17 @@ static char *buildformat (char *e, lua_Object o)
  }
  return string;
 }
+
+
+
+
 static void io_write (void)
 {
- lua_Object o1 = lua_getparam (1);
- lua_Object o2 = lua_getparam (2);
- if (o1 == NULL)			/* new line */
- {
+    lua_Object o1 = lua_getparam (1);
+    lua_Object o2 = lua_getparam (2);
+    
+    if (o1 == NULL)			/* new line */
+    {
   fprintf (stdout, "\n");
   lua_pushnumber(1);
  }

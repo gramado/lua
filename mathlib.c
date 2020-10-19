@@ -19,17 +19,17 @@
 
 
 static void math_abs (void){
-	
-    double d;
+
+    double d=0;
+
+
+    lua_Object o = lua_getparam (1);
     
-	lua_Object o = lua_getparam (1);
-    
-	if (o == NULL)
-    { 
-	    lua_error ("too few arguments to function `abs'"); 
-		return; 
+    if (o == NULL){ 
+        lua_error ("math_abs: Too few arguments to function `abs'"); 
+        return; 
     }
-	
+
     if (!lua_isnumber(o))
     { 
         lua_error ("incorrect arguments to function `abs'"); 
@@ -252,11 +252,12 @@ static void math_max (void)
 
 
 /*
+ *************************************
  ** Open math library
  */
 
 void mathlib_open (void){
-	
+
     lua_register ("abs",   math_abs);
     lua_register ("sin",   math_sin);
     lua_register ("cos",   math_cos);

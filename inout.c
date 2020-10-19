@@ -8,6 +8,9 @@
 ** 11 May 93
 */
 
+
+
+
 #include <stdio.h>
 #include <string.h>
 
@@ -16,10 +19,13 @@
 #include "inout.h"
 #include "table.h"
 
+
+
 /* Exported variables */
 int lua_linenumber;
 int lua_debug;
 int lua_debugline;
+
 
 /* Internal variables */
 #ifndef MAXFUNCSTACK
@@ -32,74 +38,96 @@ static FILE *fp;
 static char *st;
 static void (*usererror) (char *s);
 
-/*
-** Function to set user function to handle errors.
-*/
-void lua_errorfunction (void (*fn) (char *s))
-{
- usererror = fn;
-}
+
 
 /*
-** Function to get the next character from the input file
-*/
+ ****************************************
+ ** Function to set user function to handle errors.
+ */
+
+void lua_errorfunction ( void (*fn) (char *s) )
+{
+    usererror = fn;
+}
+
+
+/*
+ ****************************************
+ ** Function to get the next character from the input file
+ */
+
 static int fileinput (void)
 {
- int c = fgetc (fp);
- return (c == EOF ? 0 : c);
+   int c = fgetc(fp);
+   
+   return (c == EOF ? 0 : c);
 }
 
 /*
 ** Function to unget the next character from to input file
 */
+
 static void fileunput (int c)
 {
- ungetc (c, fp);
+    ungetc (c, fp);
 }
 
+
 /*
-** Function to get the next character from the input string
-*/
+ ** Function to get the next character from the input string
+ */
+
 static int stringinput (void)
 {
- st++;
- return (*(st-1));
+    st++;
+    
+    return (*(st-1));
 }
+
 
 /*
 ** Function to unget the next character from to input string
 */
+
 static void stringunput (int c)
 {
- st--;
+    st--;
 }
 
+
 /*
-** Function to open a file to be input unit. 
-** Return 0 on success or 1 on error.
-*/
-int lua_openfile (char *fn)
-{
- lua_linenumber = 1;
- lua_setinput (fileinput);
- lua_setunput (fileunput);
- fp = fopen (fn, "r");
- if (fp == NULL) return 1;
- if (lua_addfile (fn)) return 1;
- return 0;
+ *******************************************************
+ ** Function to open a file to be input unit. 
+ ** Return 0 on success or 1 on error.
+ */
+
+int lua_openfile (char *fn){
+
+    lua_linenumber = 1;
+    lua_setinput (fileinput);
+    lua_setunput (fileunput);
+    
+    fp = fopen (fn, "r");
+
+    if (fp == NULL) return 1;
+    
+    if (lua_addfile (fn)) return 1;
+    
+    return 0;
 }
 
 /*
 ** Function to close an opened file
 */
-void lua_closefile (void)
-{
- if (fp != NULL)
- {
-  fclose (fp);
-  fp = NULL;
- }
+void lua_closefile (void){
+
+    if (fp != NULL)
+    {
+        fclose (fp);
+        fp = NULL;   // #bugbug
+    }
 }
+
 
 /*
 ** Function to open a string to be input unit
@@ -128,21 +156,26 @@ void lua_error (char *s)
  else			    fprintf (stderr, "lua: %s\n", s);
 }
 
+
+
 /*
-** Called to execute  SETFUNCTION opcode, this function pushs a function into
-** function stack. Return 0 on success or 1 on error.
-*/
+ *******************************************************
+ ** Called to execute  SETFUNCTION opcode, this function pushs a function into
+ ** function stack. Return 0 on success or 1 on error.
+ */
+
 int lua_pushfunction (int file, int function)
 {
- if (nfuncstack >= MAXFUNCSTACK-1)
- {
-  lua_error ("function stack overflow");
-  return 1;
- }
- funcstack[nfuncstack].file = file;
- funcstack[nfuncstack].function = function;
- nfuncstack++;
- return 0;
+    if (nfuncstack >= MAXFUNCSTACK-1){
+        lua_error ("lua_pushfunction: Function stack overflow");
+        return 1;
+    }
+
+    funcstack[nfuncstack].file     = file;
+    funcstack[nfuncstack].function = function;
+    nfuncstack++;
+
+    return 0;
 }
 
 /*

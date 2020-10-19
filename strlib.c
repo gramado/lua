@@ -11,27 +11,39 @@
 #include <string.h>
 #include <ctype.h>
 
-
 #include "lua.h"
 
+
+
 /*
-** Return the position of the first caracter of a substring into a string
-** LUA interface:
-**			n = strfind (string, substring)
-*/
-static void str_find (void)
-{
- int n;
- char *s1, *s2;
- lua_Object o1 = lua_getparam (1);
- lua_Object o2 = lua_getparam (2);
- if (!lua_isstring(o1) || !lua_isstring(o2))
- { lua_error ("incorrect arguments to function `strfind'"); return; }
- s1 = lua_getstring(o1);
- s2 = lua_getstring(o2);
- n = strstr(s1,s2) - s1 + 1;
- lua_pushnumber (n);
+ ***************************************
+ ** Return the position of the first caracter of a substring into a string
+ ** LUA interface:
+ **			n = strfind (string, substring)
+ */
+
+static void str_find (void){
+
+    int n=0;
+    char *s1, *s2;
+ 
+    lua_Object o1 = lua_getparam (1);
+    lua_Object o2 = lua_getparam (2);
+    
+    if (!lua_isstring(o1) || !lua_isstring(o2))
+    { 
+        lua_error ("incorrect arguments to function `strfind'"); 
+        return; 
+    }
+
+    s1 = lua_getstring(o1);
+    s2 = lua_getstring(o2);
+    
+    n = strstr(s1,s2) - s1 + 1;
+    
+    lua_pushnumber (n);
 }
+
 
 /*
 ** Return the string length
@@ -74,25 +86,37 @@ static void str_sub (void)
  free (s);
 }
 
+
 /*
-** Convert a string to lower case.
-** LUA interface:
-**			lowercase = strlower (string)
-*/
-static void str_lower (void)
-{
- char *s, *c;
- lua_Object o = lua_getparam (1);
- if (!lua_isstring(o))
- { lua_error ("incorrect arguments to function `strlower'"); return; }
- c = s = strdup(lua_getstring(o));
- while (*c != 0)
- {
-  *c = tolower(*c);
-  c++;
- }
- lua_pushstring(s);
- free(s);
+ ***************************************************
+ ** Convert a string to lower case.
+ ** LUA interface:
+ **			lowercase = strlower (string)
+ */
+
+static void str_lower (void){
+
+    char *s, *c;
+    
+    lua_Object o = lua_getparam (1);
+    
+    if (!lua_isstring(o))
+    { 
+        lua_error ("incorrect arguments to function `strlower'"); 
+        return; 
+    }
+
+    c = s = strdup(lua_getstring(o));
+    
+    while (*c != 0)
+    {
+        *c = tolower(*c);
+        c++;
+    };
+
+    lua_pushstring(s);
+    
+    free(s);
 } 
 
 
@@ -101,20 +125,29 @@ static void str_lower (void)
 ** LUA interface:
 **			uppercase = strupper (string)
 */
+
 static void str_upper (void)
 {
- char *s, *c;
- lua_Object o = lua_getparam (1);
- if (!lua_isstring(o))
- { lua_error ("incorrect arguments to function `strlower'"); return; }
- c = s = strdup(lua_getstring(o));
- while (*c != 0)
- {
-  *c = toupper(*c);
-  c++;
- }
- lua_pushstring(s);
- free(s);
+    char *s, *c;
+    
+    lua_Object o = lua_getparam (1);
+    
+    if (!lua_isstring(o))
+    { 
+        lua_error ("incorrect arguments to function `strlower'"); 
+        return; 
+    }
+    
+    c = s = strdup(lua_getstring(o));
+    
+    while (*c != 0)
+    {
+        *c = toupper(*c);
+        c++;
+    }
+    
+    lua_pushstring(s);
+    free(s);
 } 
 
 
